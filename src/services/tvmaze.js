@@ -3,6 +3,7 @@ import { useEffect, useState, createContext, useContext } from "react";
 const showContext = createContext();
 const showSearchContext = createContext();
 const episodeReplaceContext = createContext();
+const API_BASE = "https://api.tvmaze.com";
 
 function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min)) + min;
@@ -29,6 +30,7 @@ function useEpisodeReplace() {
 
 function formatEpisode(episode) {
   const formattedEpisode = {};
+  const stripHTML = /(<([^>]+)>)/gi;
   formattedEpisode.name = episode.name;
   formattedEpisode.image = (episode.image && episode.image.medium) || null;
   formattedEpisode.number = episode.number;
@@ -38,7 +40,7 @@ function formatEpisode(episode) {
   } | ${formatDate(episode.airdate)}`;
   formattedEpisode.summary =
     episode.summary &&
-    truncateString(episode.summary.replace(/(<([^>]+)>)/gi, ""), 270);
+    truncateString(episode.summary.replace(stripHTML, ""), 270);
   return formattedEpisode;
 }
 
@@ -79,26 +81,27 @@ function formatShow(show) {
   const formattedShow = {};
   formatSeasons(formattedShow, show._embedded.episodes);
   formattedShow.name = show.name;
+  formattedShow.image = (show.image && show.image.medium) || null;
+
   formattedShow.subheader =
     (show.genres.length > 0 &&
       show.genres.join(", ") + ((show.premiered && " | ") || "")) ||
     "";
+
   formattedShow.subheader +=
     (show.premiered && `Premiered on ${formatDate(show.premiered)}`) || "";
+
   formattedShow.summary =
     show.summary &&
     truncateString(show.summary.replace(/(<([^>]+)>)/gi, ""), 700);
-  formattedShow.image = (show.image && show.image.medium) || null;
+
   return formattedShow;
 }
 
 function getShow(showID) {
-  const req = new Request(
-    `https://api.tvmaze.com/shows/${showID}?embed=episodes`,
-    {
-      method: "GET",
-    }
-  );
+  const req = new Request(`${API_BASE}/shows/${showID}?embed=episodes`, {
+    method: "GET",
+  });
   return new Promise((resolve, reject) => {
     fetch(req)
       .then((data) => {
@@ -115,7 +118,7 @@ function getShow(showID) {
 }
 
 function getShowCount() {
-  const req = new Request(`https://api.tvmaze.com/updates/shows`, {
+  const req = new Request(`${API_BASE}/updates/shows`, {
     method: "GET",
   });
   return new Promise((resolve, reject) => {
@@ -135,7 +138,7 @@ function getShowCount() {
 
 function findShow(showName) {
   const req = new Request(
-    `https://api.tvmaze.com/singlesearch/shows?q=${showName}&embed=episodes`,
+    `${API_BASE}/singlesearch/shows?q=${showName}&embed=episodes`,
     {
       method: "GET",
     }
@@ -155,12 +158,12 @@ function findShow(showName) {
   });
 }
 
-// 47892 crash
 function ShowProvider({ children }) {
   const [show, setShow] = useState();
   const [showID, setShowID] = useState();
   const [blockList, setBlockList] = useState(new Set());
   const [showCount, setShowCount] = useState();
+
   useEffect(() => {
     let num;
     // Sometimes a show is no longer available such as ID 121, so ensure a valid page is always displayed.
@@ -175,6 +178,7 @@ function ShowProvider({ children }) {
     }
     setShowID(num);
   }, [blockList, showCount]);
+
   useEffect(() => {
     if (showID) {
       getShow(showID)
@@ -182,6 +186,9 @@ function ShowProvider({ children }) {
           setShow(formatShow(data));
         })
         .catch((reason) => {
+          console.error(
+            `Failed to get show. Show ID: ${showID}. Reason: ${reason}`
+          );
           setBlockList((blockList) => {
             const ret = new Set(blockList);
             // We add invalid IDs to the blocklist so we don't attempt to use them again.
