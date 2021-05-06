@@ -46,22 +46,28 @@ function formatEpisode(episode) {
 // Some shows do not have any episodes but are still listed: 31012
 function formatSeasons(show, episodes) {
   if (episodes.length < 1) return;
-  let seasonIndex = 0;
-  show.seasons = episodes.reduce((acc, val) => {
-    const hasSeason = (season) => season.info.number === val.season;
-    if (acc.findIndex(hasSeason) === -1) {
-      seasonIndex =
-        acc.push({
-          info: {
-            airdate: formatDate(val.airdate),
-            number: val.season,
-          },
-          episodes: [],
-        }) - 1;
-    }
-    acc[seasonIndex].episodes.push(val);
-    return acc;
-  }, []);
+  const formattedSeasons = episodes.reduce(
+    (acc, val) => {
+      if (typeof acc.seasonsToIndex[val.season] === "undefined") {
+        const seasonIndex =
+          acc.seasons.push({
+            info: {
+              airdate: formatDate(val.airdate),
+              number: val.season,
+            },
+            episodes: [],
+          }) - 1;
+        acc.seasonsToIndex[val.season] = seasonIndex;
+      }
+      acc.seasons[acc.seasonsToIndex[val.season]].episodes.push(
+        formatEpisode(val)
+      );
+      return acc;
+    },
+    { seasonsToIndex: {}, seasons: [] }
+  );
+  console.log(formattedSeasons.seasons, "HELLO");
+  show.seasons = formattedSeasons.seasons;
 }
 
 function formatDate(date) {
@@ -178,6 +184,7 @@ function ShowProvider({ children }) {
           setShow(formatShow(data));
         })
         .catch((reason) => {
+          console.log(reason);
           setBlockList((blockList) => {
             const ret = new Set(blockList);
             // We add invalid IDs to the blocklist so we don't attempt to use them again.
