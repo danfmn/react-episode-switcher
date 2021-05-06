@@ -1,5 +1,6 @@
 import "./ShowReplace.css";
 import ErrorNotice from "./ErrorNotice.js";
+import LoadingIcon from "./Loading.js";
 import { useState, useEffect } from "react";
 import { useShow, useEpisodeReplace } from "../services/tvmaze.js";
 
@@ -8,14 +9,20 @@ function ShowReplace() {
   const [seasonIndex, setSeasonIndex] = useState(0);
   const [episodeNumber, setEpisodeNumber] = useState(1);
   const [searchStr, setSearchStr] = useState("");
+  const [searching, setSearching] = useState(false);
   const show = useShow();
   const replaceEpisode = useEpisodeReplace();
 
   useEffect(() => {
     setError(null);
-    setSeasonIndex(0);
-    setEpisodeNumber(1);
   }, [show]);
+
+  useEffect(() => {
+    if (show && show.seasons && !show.seasons[seasonIndex]) {
+      setSeasonIndex(0);
+      setEpisodeNumber(1);
+    }
+  }, [show, seasonIndex]);
 
   function episodeChange(event) {
     setEpisodeNumber(Number(event.target.value));
@@ -35,12 +42,15 @@ function ShowReplace() {
       setError("Please enter a TV show name.");
       return;
     }
+    setSearching(true);
     replaceEpisode(searchStr, seasonIndex, episodeNumber)
       .then(() => {
+        setSearching(false);
         setError(null);
       })
       .catch((reason) => {
         setError(reason.message);
+        setSearching(false);
       });
   }
 
@@ -98,6 +108,11 @@ function ShowReplace() {
           </div>
         </form>
         {error && <ErrorNotice msg={error} />}
+        {searching && (
+          <div className="d-flex">
+            <LoadingIcon />
+          </div>
+        )}
       </>
     );
   }
