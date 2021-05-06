@@ -1,4 +1,5 @@
 import "./Episode.css";
+import LoadingIcon from "./Loading.js";
 function Episode(props) {
   if (props.episode) {
     return (
@@ -22,7 +23,7 @@ function Episode(props) {
       </div>
     );
   }
-  return <></>;
+  return <LoadingIcon />;
 }
 
 export default Episode;

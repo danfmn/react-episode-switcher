@@ -1,5 +1,6 @@
 import "./Show.css";
 import { useShow } from "../services/tvmaze.js";
+
 function Show() {
   const show = useShow();
   if (show) {
@@ -20,7 +21,7 @@ function Show() {
       </div>
     );
   }
-  return <> </>;
+  return null;
 }
 
 export default Show;

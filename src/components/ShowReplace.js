@@ -2,6 +2,7 @@ import "./ShowReplace.css";
 import ErrorNotice from "./ErrorNotice.js";
 import { useState, useEffect } from "react";
 import { useShow, useEpisodeReplace } from "../services/tvmaze.js";
+
 function ShowReplace() {
   const [error, setError] = useState();
   const [seasonIndex, setseasonIndex] = useState(0);
@@ -43,12 +44,10 @@ function ShowReplace() {
           );
           return;
         }
-        if (reason.status === 404) {
-          setError(`There is no show matching "${searchStr}"`);
-        }
         setError(`There is no show matching "${searchStr}"`);
       });
   }
+
   // Some shows do not have episodes / seasons however they will still be retrieved from the API.
   if (show && show.seasons) {
     return (
@@ -59,7 +58,7 @@ function ShowReplace() {
               <span className="mr-4">Replace</span>
               <select
                 className="show-select custom-select mr-4"
-                aria-label="Season 1"
+                aria-label="Select Season"
                 onChange={seasonChange}
               >
                 {show.seasons.map((seasonData, index) => {
@@ -72,7 +71,7 @@ function ShowReplace() {
               </select>
               <select
                 className="show-select custom-select mr-4"
-                aria-label="Episode 1"
+                aria-label="Select Episode"
                 onChange={episodeChange}
               >
                 {show.seasons[seasonIndex].episodes.map((episode, index) => {
@@ -106,7 +105,7 @@ function ShowReplace() {
       </>
     );
   }
-  return <></>;
+  return null;
 }
 
 export default ShowReplace;

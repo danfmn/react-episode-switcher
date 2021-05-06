@@ -1,8 +1,6 @@
 .show-image {
-  min-width: 210px;
-  min-height: 295px;
-  max-width: 210px;
-  max-height: 295px;
+  width: 210px;
+  height: 295px;
 }
 .show-image p {
   font-size: 2rem;

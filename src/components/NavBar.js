@@ -1,16 +1,18 @@
 import { useShowSearch } from "../services/tvmaze.js";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ErrorNotice from "./ErrorNotice.js";
+import LoadingIcon from "./Loading.js";
+
 function NavBar() {
   const searchShow = useShowSearch();
   const [searchStr, setSearchStr] = useState("");
-  const [error, setError] = useState();
-  useEffect(() => {
-    setError(null);
-  }, [searchShow]);
+  const [error, setError] = useState(null);
+  const [searching, setSearching] = useState(false);
+
   function handleChange(event) {
     setSearchStr(event.target.value);
   }
+
   function handleSubmit(event) {
     event.preventDefault();
     if (searchStr === "") {
@@ -18,15 +20,21 @@ function NavBar() {
       setSearchStr("");
       return;
     }
+
+    setSearching(true);
     searchShow(searchStr)
       .then(() => {
         setError(null);
+        setSearching(false);
       })
       .catch((reason) => {
         setError(`There is no show matching "${searchStr}"`);
+        setSearching(false);
       });
+
     setSearchStr("");
   }
+
   return (
     <>
       <nav className="navbar navbar-dark bg-dark">
@@ -54,6 +62,7 @@ function NavBar() {
         </div>
       </nav>
       {error && <ErrorNotice msg={error} />}
+      {searching && <LoadingIcon />}
     </>
   );
 }
