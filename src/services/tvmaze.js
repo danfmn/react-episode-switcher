@@ -66,7 +66,6 @@ function formatSeasons(show, episodes) {
     },
     { seasonsToIndex: {}, seasons: [] }
   );
-  console.log(formattedSeasons.seasons, "HELLO");
   show.seasons = formattedSeasons.seasons;
 }
 
@@ -77,7 +76,6 @@ function formatDate(date) {
 }
 
 function formatShow(show) {
-  console.log(show);
   const formattedShow = {};
   formatSeasons(formattedShow, show._embedded.episodes);
   formattedShow.name = show.name;
@@ -96,7 +94,7 @@ function formatShow(show) {
 
 function getShow(showID) {
   const req = new Request(
-    `http://api.tvmaze.com/shows/${showID}?embed=episodes`,
+    `https://api.tvmaze.com/shows/${showID}?embed=episodes`,
     {
       method: "GET",
     }
@@ -117,7 +115,7 @@ function getShow(showID) {
 }
 
 function getShowCount() {
-  const req = new Request(`http://api.tvmaze.com/updates/shows`, {
+  const req = new Request(`https://api.tvmaze.com/updates/shows`, {
     method: "GET",
   });
   return new Promise((resolve, reject) => {
@@ -137,7 +135,7 @@ function getShowCount() {
 
 function findShow(showName) {
   const req = new Request(
-    `http://api.tvmaze.com/singlesearch/shows?q=${showName}&embed=episodes`,
+    `https://api.tvmaze.com/singlesearch/shows?q=${showName}&embed=episodes`,
     {
       method: "GET",
     }
@@ -184,7 +182,6 @@ function ShowProvider({ children }) {
           setShow(formatShow(data));
         })
         .catch((reason) => {
-          console.log(reason);
           setBlockList((blockList) => {
             const ret = new Set(blockList);
             // We add invalid IDs to the blocklist so we don't attempt to use them again.
