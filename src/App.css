@@ -2,9 +2,17 @@
   text-align: center;
 }
 
+body {
+  font-family: Roboto;
+}
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
+}
+
+.App-content {
+  border: 1px solid blue;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -14,7 +22,7 @@
 }
 
 .App-header {
-  background-color: #282c34;
+  background-color: #fff;
   min-height: 100vh;
   display: flex;
   flex-direction: column;

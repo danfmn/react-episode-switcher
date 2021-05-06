@@ -1,23 +1,21 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import NavBar from "./components/NavBar.js";
+import Show from "./components/Show.js";
+import ShowReplace from "./components/ShowReplace.js";
+import EpisodeList from "./components/EpisodeList.js";
+import { ShowProvider } from "./services/tvmaze.js";
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <ShowProvider>
+        <NavBar />
+        <div className="container pt-4">
+          <Show />
+          <ShowReplace />
+          <EpisodeList />
+        </div>
+      </ShowProvider>
     </div>
   );
 }
