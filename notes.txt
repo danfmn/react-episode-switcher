@@ -1,7 +1,0 @@
-No more than 700 characters for show description use a "..."
-Episode descriptions are no more than 270 characters.
-Page should wait for everything to load before displaying, add loading animation.
-Use txt for NA on episodes that have no image.
-Format date properly to Feb. 11, 2021
-Add keyboard support for pressing Enter
-Remove HTML from show description and just have plain text.
