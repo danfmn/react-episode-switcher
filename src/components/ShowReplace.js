@@ -5,7 +5,7 @@ import { useShow, useEpisodeReplace } from "../services/tvmaze.js";
 
 function ShowReplace() {
   const [error, setError] = useState();
-  const [seasonIndex, setseasonIndex] = useState(0);
+  const [seasonIndex, setSeasonIndex] = useState(0);
   const [episodeNumber, setEpisodeNumber] = useState(1);
   const [searchStr, setSearchStr] = useState("");
   const show = useShow();
@@ -13,6 +13,8 @@ function ShowReplace() {
 
   useEffect(() => {
     setError(null);
+    setSeasonIndex(0);
+    setEpisodeNumber(1);
   }, [show]);
 
   function episodeChange(event) {
@@ -24,7 +26,7 @@ function ShowReplace() {
   }
 
   function seasonChange(event) {
-    setseasonIndex(Number(event.target.value));
+    setSeasonIndex(Number(event.target.value));
   }
 
   function handleSubmit(event) {
@@ -38,13 +40,7 @@ function ShowReplace() {
         setError(null);
       })
       .catch((reason) => {
-        if (typeof reason.message !== "undefined") {
-          setError(
-            "There is no matching episode for the season, episode, and show provided."
-          );
-          return;
-        }
-        setError(`There is no show matching "${searchStr}"`);
+        setError(reason.message);
       });
   }
 
@@ -74,7 +70,7 @@ function ShowReplace() {
                 aria-label="Select Episode"
                 onChange={episodeChange}
               >
-                {show.seasons[seasonIndex].episodes.map((episode, index) => {
+                {show.seasons[seasonIndex]?.episodes.map((episode, index) => {
                   return (
                     <option key={index} value={episode.number}>
                       Episode {episode.number}

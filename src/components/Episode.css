@@ -1,6 +1,7 @@
 .episode-image {
   width: 250px;
   height: 140px;
+  min-width: 250px;
 }
 
 .episode-image p {

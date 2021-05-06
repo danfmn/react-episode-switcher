@@ -149,7 +149,7 @@ function findShow(showName) {
         if (data.status === 200) {
           resolve(data.json());
         } else {
-          reject(data);
+          reject({ message: `There is no show matching "${showName}"` });
         }
       })
       .catch((reason) => {
@@ -207,31 +207,45 @@ function ShowProvider({ children }) {
 
   function replaceEpisode(showName, seasonIndex, episodeNumber) {
     const seasonNumber = show.seasons[seasonIndex].info.number;
-    return findShow(showName).then((json) => {
-      const tempShow = json;
-      const newEpisode = formatEpisode(
-        tempShow._embedded.episodes.find(
-          (ep) => ep.season === seasonNumber && ep.number === episodeNumber
-        )
-      );
-
-      setShow((show) => {
-        const seasons = show.seasons.map((season, index) => {
-          if (season.info.number === seasonNumber) {
-            // Replace the episodes
-            const episodes = season.episodes.map((ep) => {
-              if (ep.number === episodeNumber) {
-                return newEpisode;
-              }
-              return ep;
+    return new Promise((resolve, reject) => {
+      findShow(showName)
+        .then((json) => {
+          const tempShow = json;
+          const targEp = tempShow._embedded.episodes.find(
+            (ep) => ep.season === seasonNumber && ep.number === episodeNumber
+          );
+          if (!targEp) {
+            reject({
+              message:
+                "There is no matching episode for the season, episode, and show provided.",
             });
-            return { ...season, episodes: episodes };
+            return;
           }
-          return season;
-        });
 
-        return { ...show, seasons: seasons };
-      });
+          const newEpisode = formatEpisode(targEp);
+
+          setShow((show) => {
+            const seasons = show.seasons.map((season, index) => {
+              if (season.info.number === seasonNumber) {
+                // Replace the episodes
+                const episodes = season.episodes.map((ep) => {
+                  if (ep.number === episodeNumber) {
+                    return newEpisode;
+                  }
+                  return ep;
+                });
+                return { ...season, episodes: episodes };
+              }
+              return season;
+            });
+
+            return { ...show, seasons: seasons };
+          });
+          resolve();
+        })
+        .catch((reason) => {
+          reject(reason);
+        });
     });
   }
 

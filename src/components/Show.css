@@ -1,5 +1,6 @@
 .show-image {
   width: 210px;
+  min-width: 210px;
   height: 295px;
 }
 .show-image p {
